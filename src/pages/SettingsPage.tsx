@@ -83,7 +83,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-purple-100">
+    <div className="flex items-center justify-center h-screen bg-green-900">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-2xl shadow-lg w-96"
@@ -135,7 +135,7 @@ export default function SettingsPage() {
 
         <button
           type="submit"
-          className="w-full bg-purple-500 text-white py-2 rounded hover:bg-purple-600 transition"
+          className="w-full bg-green-900 text-white py-2 rounded hover:bg-green-700 transition"
         >
           Save Settings
         </button>

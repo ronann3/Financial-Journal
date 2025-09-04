@@ -18,7 +18,6 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-        alert("✅ Logged in successfully!");
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
         alert("🎉 Account created successfully!");
@@ -36,7 +35,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
+    <div className="flex items-center justify-center h-screen bg-green-900">
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-2xl shadow-md w-80"
@@ -63,14 +62,14 @@ export default function AuthPage() {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+          className="w-full bg-green-900 text-white py-2 rounded hover:bg-green-700 transition"
         >
           {isLogin ? "Login" : "Register"}
         </button>
 
         <p
           onClick={() => setIsLogin(!isLogin)}
-          className="text-blue-600 mt-3 text-sm cursor-pointer text-center hover:underline"
+          className="text-green-900 mt-3 text-sm cursor-pointer text-center hover:underline"
         >
           {isLogin
             ? "Need an account? Register"

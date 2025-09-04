@@ -111,14 +111,26 @@ export default function JournalPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-green-100">
+    <div className="flex flex-col min-h-screen bg-green-900">
       <NavBar />
       <div className="flex flex-1 w-full p-6">
         <h1 className="sr-only">Journal Page</h1> {/* screen-reader only now */}
         <div className="flex flex-row w-full gap-6">
           {/* Left column - Purchase Cases */}
           <div className="flex flex-col flex-1 max-w-2xl space-y-4">
-            <h1 className="text-2xl font-bold mb-4">Journal Page</h1>
+            <h1 className="text-3xl font-bold text-white">
+              Daily Spend Journal:{" "}
+              {new Date().toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              })}
+            </h1>
+
+            <p className="text-white text-sm">
+              Every dollar spent tells today’s story. Log purchases to face what
+              they are and why you chose them.
+            </p>
             {loading ? (
               <p>Loading...</p>
             ) : cases.length > 0 ? (
@@ -166,28 +178,29 @@ export default function JournalPage() {
           </div>
 
           {/* Right column - Feedback Section */}
-          <div className="w-1/2 flex flex-col items-start space-y-4">
-            {/* Get AI Feedback button */}
+          <div className="w-1/2 flex flex-col items-start space-y-4 mt-22">
+            <div className="p-6 bg-white rounded-md w-full min-h-[300px]">
+              <h2 className="text-xl font-bold mb-2">
+                Today’s Spend Breakdown 📝
+              </h2>
+              {/* Render feedback with line breaks */}
+              {feedback ? (
+                <div className="text-gray-600 whitespace-pre-line">
+                  {feedback}
+                </div>
+              ) : (
+                <p className="text-gray-600">
+                  Review will appear here after generating.
+                </p>
+              )}
+            </div>
             <button
               onClick={handleFeedbackRequest}
               disabled={isGenerating}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+              className="px-4 py-2 bg-white text-green-950 rounded-md hover:bg-gray-300 disabled:opacity-50"
             >
-              {isGenerating ? "Generating..." : "Get AI Feedback"}
+              {isGenerating ? "Generating..." : "Review My Day"}
             </button>
-
-            {/* Always-visible AI Feedback box */}
-            <div className="p-6 bg-white rounded-md w-full min-h-[300px]">
-              <h2 className="text-xl font-bold mb-2">
-                AI Financial Feedback 🤖
-              </h2>
-              {/* Show feedback if it exists, otherwise a placeholder */}
-              <p className="text-gray-600">
-                {feedback
-                  ? feedback
-                  : "AI feedback will appear here after generating."}
-              </p>
-            </div>
           </div>
         </div>
       </div>
