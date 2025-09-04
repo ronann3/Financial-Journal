@@ -22,6 +22,9 @@ The app encourages **self-awareness, better judgment, and motivation** by helpin
 - **Backend:** Firebase Firestore, Firebase Auth, Firebase Functions
 - **AI Integration:** Gemini AI for reflective analysis and scoring
 
+## Presentation: 
+https://youtu.be/WxFnXHIiDSw
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
