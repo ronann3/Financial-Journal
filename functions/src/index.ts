@@ -8,19 +8,23 @@ const GEMINI_API_KEY = defineSecret("GEMINI_API_KEY");
 
 // Helper to coerce/validate output
 function normalizeResponse(anyObj: any) {
-  const essentials = Array.isArray(anyObj?.["✅ Essentials"])
-    ? anyObj["✅ Essentials"].map(String)
-    : [];
-  const wasteful = Array.isArray(anyObj?.["⚠️ Wasteful"])
-    ? anyObj["⚠️ Wasteful"].map(String)
-    : [];
-  const analysis =
-    typeof anyObj?.["📈 Overall Daily Analysis"] === "string"
-      ? anyObj["📈 Overall Daily Analysis"]
-      : "";
-  let score = Number(anyObj?.["📊 Value Score"]);
-  if (!Number.isFinite(score) || score < 0 || score > 100) score = 0;
-  return { essentials, wasteful, analysis, score };
+  return {
+    essentials: Array.isArray(anyObj?.["✅ Essentials"])
+      ? anyObj["✅ Essentials"]
+      : [],
+    wasteful: Array.isArray(anyObj?.["⚠️ Wasteful"])
+      ? anyObj["⚠️ Wasteful"]
+      : [],
+    analysis:
+      typeof anyObj?.["📈 Overall Daily Analysis"] === "string"
+        ? anyObj["📈 Overall Daily Analysis"]
+        : "",
+    score:
+      typeof anyObj?.["📊 Value Score"] === "string" ||
+      typeof anyObj?.["📊 Value Score"] === "number"
+        ? anyObj["📊 Value Score"]
+        : 0,
+  };
 }
 
 export const getFinancialFeedback = onCall(
@@ -88,12 +92,17 @@ ${cases
 
       return {
         feedback: `
-Essentials: ${normalized.essentials.join("\n") || "None"}
-Wasteful: ${normalized.wasteful.join("\n") || "None"}
-Analysis: 
+✅ Essentials:
+${normalized.essentials.length ? normalized.essentials.join("\n") : "None"}
+
+⚠️ Wasteful:
+${normalized.wasteful.length ? normalized.wasteful.join("\n") : "None"}
+
+📈 Overall Daily Analysis:
 ${normalized.analysis}
 
-Score: ${normalized.score}/100
+📊 Value Score:
+${normalized.score}
         `.trim(),
       };
     } catch (err: any) {
