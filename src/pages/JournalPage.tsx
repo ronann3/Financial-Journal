@@ -52,7 +52,7 @@ export default function JournalPage() {
         const caseList: PurchaseCase[] = snapshot.docs.map((doc) => ({
           id: doc.id,
           name: doc.id,
-          price: doc.data().Price || 0,
+          price: doc.data().price,
           category: doc.data().category || "Unknown",
           note: doc.data().note || "Unknown",
         }));
@@ -113,71 +113,83 @@ export default function JournalPage() {
   return (
     <div className="flex flex-col min-h-screen bg-green-100">
       <NavBar />
-      <div className="flex flex-col items-start justify-start flex-1 w-full p-6">
-        <h1 className="text-2xl font-bold mb-4">Journal Page</h1>
-
-        {loading ? (
-          <p>Loading...</p>
-        ) : cases.length > 0 ? (
-          <div className="flex flex-col space-y-4 w-full max-w-md">
-            {cases.map((c) => (
-              <div
-                key={c.id}
-                className="p-4 bg-white rounded shadow w-full flex flex-col space-y-3"
-              >
-                {/* Display the ID string as the title */}
-                <p className="text-lg font-bold">{c.id}</p>
-
-                {/* Always show Category and Note with label alignment */}
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3">
-                    <span className="w-24 font-semibold text-gray-700">
-                      Category:
-                    </span>
-                    <input
-                      type="text"
-                      value={c.category}
-                      onChange={(e) =>
-                        handleInputChange(c.id, "category", e.target.value)
-                      }
-                      className="flex-1 border p-2 rounded w-full"
-                    />
+      <div className="flex flex-1 w-full p-6">
+        <h1 className="sr-only">Journal Page</h1> {/* screen-reader only now */}
+        <div className="flex flex-row w-full gap-6">
+          {/* Left column - Purchase Cases */}
+          <div className="flex flex-col flex-1 max-w-2xl space-y-4">
+            <h1 className="text-2xl font-bold mb-4">Journal Page</h1>
+            {loading ? (
+              <p>Loading...</p>
+            ) : cases.length > 0 ? (
+              <div className="flex flex-col space-y-4 w-full">
+                {cases.map((c) => (
+                  <div
+                    key={c.id}
+                    className="p-4 bg-white rounded shadow w-full flex flex-col space-y-3"
+                  >
+                    <p className="text-lg font-bold">{c.id}</p>
+                    <p className="text-gray-600">Price: ${c.price}</p>
+                    <div className="space-y-2">
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 mb-1">
+                          Category:
+                        </label>
+                        <input
+                          type="text"
+                          value={c.category}
+                          onChange={(e) =>
+                            handleInputChange(c.id, "category", e.target.value)
+                          }
+                          className="border p-2 rounded w-full"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="font-semibold text-gray-700 mb-1">
+                          Note:
+                        </label>
+                        <textarea
+                          value={c.note}
+                          onChange={(e) =>
+                            handleInputChange(c.id, "note", e.target.value)
+                          }
+                          className="border p-2 rounded w-full h-24 resize-none"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="w-24 font-semibold text-gray-700">
-                      Note:
-                    </span>
-                    <input
-                      type="text"
-                      value={c.note}
-                      onChange={(e) =>
-                        handleInputChange(c.id, "note", e.target.value)
-                      }
-                      className="flex-1 border p-2 rounded w-full"
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <p>No Purchase-Cases found.</p>
+            )}
+          </div>
+
+          {/* Right column - Feedback Section */}
+          <div className="w-1/2 flex flex-col items-start space-y-4">
+            {/* Get AI Feedback button */}
             <button
               onClick={handleFeedbackRequest}
               disabled={isGenerating}
-              className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
             >
               {isGenerating ? "Generating..." : "Get AI Feedback"}
             </button>
-            {feedback && (
-              <div className="mt-6 p-4 bg-gray-100 rounded-md whitespace-pre-line">
-                <h2 className="text-xl font-bold mb-2">
-                  AI Financial Feedback 🤖
-                </h2>
-                {feedback}
-              </div>
-            )}
+
+            {/* Always-visible AI Feedback box */}
+            <div className="p-6 bg-white rounded-md w-full min-h-[300px]">
+              <h2 className="text-xl font-bold mb-2">
+                AI Financial Feedback 🤖
+              </h2>
+              {/* Show feedback if it exists, otherwise a placeholder */}
+              <p className="text-gray-600">
+                {feedback
+                  ? feedback
+                  : "AI feedback will appear here after generating."}
+              </p>
+            </div>
           </div>
-        ) : (
-          <p>No Purchase-Cases found.</p>
-        )}
+        </div>
       </div>
     </div>
   );
