@@ -114,7 +114,7 @@ export default function JournalPage() {
     <div className="flex flex-col min-h-screen bg-green-900">
       <NavBar />
       <div className="flex flex-1 w-full p-6">
-        <h1 className="sr-only">Journal Page</h1> {/* screen-reader only now */}
+        <h1 className="sr-only">Journal Page</h1>
         <div className="flex flex-row w-full gap-6">
           {/* Left column - Purchase Cases */}
           <div className="flex flex-col flex-1 max-w-2xl space-y-4">
@@ -183,7 +183,6 @@ export default function JournalPage() {
               <h2 className="text-xl font-bold mb-2">
                 Today’s Spend Breakdown 📝
               </h2>
-              {/* Render feedback with line breaks */}
               {feedback ? (
                 <div className="text-gray-600 whitespace-pre-line">
                   {feedback}

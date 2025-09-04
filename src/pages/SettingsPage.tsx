@@ -11,10 +11,9 @@ export default function SettingsPage() {
     salary: "",
     goalAmount: "",
     goalDate: "",
-    journalTime: "", // user picks in browser time input
+    journalTime: "",
   });
 
-  // Load existing settings from Firestore if returning user
   useEffect(() => {
     const loadSettings = async () => {
       const user = auth.currentUser;
@@ -68,7 +67,6 @@ export default function SettingsPage() {
     }
 
     try {
-      // Save settings to Firestore
       await setDoc(doc(db, "Users", user.uid), {
         ...settings,
         userSetupComplete: true,

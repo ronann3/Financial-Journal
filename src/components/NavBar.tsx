@@ -7,8 +7,8 @@ export default function NavBar() {
   const handleSignOut = async () => {
     try {
       await auth.signOut();
-      localStorage.clear(); // clears all user data
-      navigate("/auth"); // redirect to AuthPage
+      localStorage.clear();
+      navigate("/auth");
     } catch (err: any) {
       alert("Error signing out: " + err.message);
     }
