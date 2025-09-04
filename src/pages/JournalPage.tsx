@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import NavBar from "../components/NavBar";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 interface PurchaseCase {
   id: string;
@@ -21,10 +22,16 @@ interface UserSettings {
   [key: string]: any;
 }
 
+interface FinancialFeedbackResponse {
+  feedback: string;
+}
+
 export default function JournalPage() {
   const [cases, setCases] = useState<PurchaseCase[]>([]);
   const [settings, setSettings] = useState<UserSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +51,8 @@ export default function JournalPage() {
         const snapshot = await getDocs(collection(db, "Purchase-Cases"));
         const caseList: PurchaseCase[] = snapshot.docs.map((doc) => ({
           id: doc.id,
-          name: doc.data().name || "Unnamed",
+          name: doc.id,
+          price: doc.data().Price || 0,
           category: doc.data().category || "Unknown",
           note: doc.data().note || "Unknown",
         }));
@@ -74,6 +82,32 @@ export default function JournalPage() {
           : c
       )
     );
+  };
+
+  const functions = getFunctions(undefined, "us-west1");
+  const getAiFeedback = httpsCallable<any, FinancialFeedbackResponse>(
+    functions,
+    "getFinancialFeedback"
+  );
+
+  const handleFeedbackRequest = async () => {
+    if (!settings || cases.length === 0) {
+      alert(
+        "Please ensure all transactions are noted and user settings are complete."
+      );
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const result = await getAiFeedback({ cases, settings });
+      setFeedback(result.data.feedback);
+    } catch (error) {
+      console.error("Failed to get AI feedback:", error);
+      setFeedback("An error occurred while getting feedback.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -125,6 +159,21 @@ export default function JournalPage() {
                 </div>
               </div>
             ))}
+            <button
+              onClick={handleFeedbackRequest}
+              disabled={isGenerating}
+              className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50"
+            >
+              {isGenerating ? "Generating..." : "Get AI Feedback"}
+            </button>
+            {feedback && (
+              <div className="mt-6 p-4 bg-gray-100 rounded-md whitespace-pre-line">
+                <h2 className="text-xl font-bold mb-2">
+                  AI Financial Feedback 🤖
+                </h2>
+                {feedback}
+              </div>
+            )}
           </div>
         ) : (
           <p>No Purchase-Cases found.</p>
