@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -13,13 +14,24 @@ export default function SettingsPage() {
     journalTime: "", // user picks in browser time input
   });
 
-  // Load existing settings if returning user
+  // Load existing settings from Firestore if returning user
   useEffect(() => {
-    const stored = localStorage.getItem("userData");
-    if (stored) {
-      const data = JSON.parse(stored);
-      setSettings((prev) => ({ ...prev, ...data }));
-    }
+    const loadSettings = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      try {
+        const docRef = doc(db, "Users", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setSettings((prev) => ({ ...prev, ...docSnap.data() }));
+        }
+      } catch (error) {
+        console.error("Error loading user settings:", error);
+      }
+    };
+
+    loadSettings();
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,14 +48,12 @@ export default function SettingsPage() {
     if (Number(settings.goalAmount) <= 0) return "Goal Amount must be >0";
     if (!settings.goalDate || new Date(settings.goalDate) <= new Date())
       return "Goal Date must be in the future";
-
-    // No strict format validation for journalTime
     if (!settings.journalTime) return "Journal time is required";
 
     return null;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const error = validate();
     if (error) {
@@ -57,25 +67,19 @@ export default function SettingsPage() {
       return;
     }
 
-    // Save settings locally
-    const existing = localStorage.getItem("userData");
-    const userData = existing ? JSON.parse(existing) : {};
-    localStorage.setItem(
-      "userData",
-      JSON.stringify({
-        ...userData,
-        firstName: settings.firstName,
-        salary: settings.salary,
-        goalAmount: settings.goalAmount,
-        goalDate: settings.goalDate,
-        journalTime: settings.journalTime,
-        userSetupComplete: "true",
-      })
-    );
+    try {
+      // Save settings to Firestore
+      await setDoc(doc(db, "Users", user.uid), {
+        ...settings,
+        userSetupComplete: true,
+        updatedAt: new Date(),
+      });
 
-    localStorage.setItem("userName", settings.firstName);
-
-    navigate("/journal");
+      navigate("/journal");
+    } catch (error) {
+      console.error("Error saving settings to Firestore:", error);
+      alert("Failed to save settings. Please try again.");
+    }
   };
 
   return (
