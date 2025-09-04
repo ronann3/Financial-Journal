@@ -25,6 +25,9 @@ The app encourages **self-awareness, better judgment, and motivation** by helpin
 ## Presentation: 
 https://youtu.be/WxFnXHIiDSw
 
+## Documentation:
+Documentation.pdf in the Repo
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
